@@ -31,6 +31,13 @@ public class Graph {
     }
 
 
+    private double weight(int i, int j){
+        if(i == j) return 0;
+        else if (adjacencyMatrix[i][j] == null) return Double.MAX_VALUE;
+        return adjacencyMatrix[i][j];
+    }
+
+
     /** Implementation of the Floyd - Warshall algorithm for computing all - pair shortest
      * paths in a directed graph with negative edge weights. It is assumed that the graph does
      * not have a negative weight cycle.
@@ -75,7 +82,7 @@ public class Graph {
     }
 
 
-    /** A method that computes the transitive closure of a given graph, that is it returns a Boolean matrix T,
+    /** A method that computes the transitive closure of the graph, that is it returns a Boolean matrix T,
      * where T[i][j] is true if there is a path from i to j in the graph, false otherwise.
      *
      * Algorithm runs in O(V^3) time.
@@ -105,13 +112,6 @@ public class Graph {
         }
         return T;
     }
-
-    private double weight(int i, int j){
-        if(i == j) return 0;
-        else if (adjacencyMatrix[i][j] == null) return Double.MAX_VALUE;
-        return adjacencyMatrix[i][j];
-    }
-
 
     /**Function for computing shortest paths i -> j (for all (i, j) e V) when using at most m edges.
      * The m parameter is specified when iterating and calling this function for each m (1...n-1). This function

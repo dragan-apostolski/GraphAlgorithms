@@ -129,18 +129,18 @@ public class DirectedGraph {
             distance[i] = Double.POSITIVE_INFINITY;
         }
         distance[source] = 0;
-        for (int i = source; i < numberVertices - 1; i++) {
-            Vertex u = adjList[i];
-            for(Vertex v : u.neighbors.keySet()){
-                if(distance[u.index] + weight(u, v) < distance[v.index]){
-                    distance[v.index] = distance[u.index] + weight(u, v);
+        for (int i = 0; i < numberVertices - 1; i++) {
+            for(Vertex u : adjList) {
+                for (Vertex v : u.neighbors.keySet()) {
+                    if (distance[u.index] + weight(u, v) < distance[v.index]) {
+                        distance[v.index] = distance[u.index] + weight(u, v);
+                    }
                 }
             }
         }
-        for (int i = source; i < numberVertices; i++) {
-            Vertex u = adjList[i];
-            for(Vertex v : u.neighbors.keySet()){
-                if(distance[u.index] + weight(u, v) < distance[v.index]) {
+        for(Vertex u : adjList) {
+            for (Vertex v : u.neighbors.keySet()) {
+                if (distance[u.index] + weight(u, v) < distance[v.index]) {
                     throw new NegativeCycleException("Negative cycle detected");
                 }
             }
@@ -157,6 +157,6 @@ public class DirectedGraph {
         for (int i = 0; i < m; i++) {
             g.addEdge(sc.nextInt(), sc.nextInt(), sc.nextInt());
         }
-        System.out.println(Arrays.toString(g.dijkstra(sc.nextInt())));
+        System.out.println(Arrays.toString(g.bellmanFord(sc.nextInt())));
     }
 }

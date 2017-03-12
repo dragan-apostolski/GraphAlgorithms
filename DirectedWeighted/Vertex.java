@@ -32,6 +32,7 @@ public class Vertex implements Comparable<Vertex>{
         return minDistance.compareTo(o.minDistance);
     }
 
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
