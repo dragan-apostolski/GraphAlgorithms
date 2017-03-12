@@ -1,5 +1,6 @@
 package Graphs.DirectedMatrixGraph;
 
+
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -7,13 +8,11 @@ public class Graph {
 
     private int numberOfNodes;
     private Double [][] adjacencyMatrix;
-    private int [][] predecessorMatrix;
 
 
     public Graph(int numberOfNodes) {
         this.numberOfNodes = numberOfNodes;
         this.adjacencyMatrix = new Double[numberOfNodes][numberOfNodes];
-        this.predecessorMatrix = new int[numberOfNodes][numberOfNodes];
         for (Double[] anAdjacencyMatrix : adjacencyMatrix) {
             Arrays.fill(anAdjacencyMatrix, Double.POSITIVE_INFINITY);
         }
@@ -25,7 +24,6 @@ public class Graph {
     public Graph(int numberOfNodes, Double [][] adjacencyMatrix){
         this.numberOfNodes = numberOfNodes;
         this.adjacencyMatrix = adjacencyMatrix;
-        this.predecessorMatrix = new int[numberOfNodes][numberOfNodes];
     }
 
     public void addEdge(int i, int j, Double weight){
@@ -34,9 +32,12 @@ public class Graph {
 
 
     /** Implementation of the Floyd - Warshall algorithm for computing all - pair shortest
-     * paths in a graph.
+     * paths in a directed graph with negative edge weights. It is assumed that the graph does
+     * not have a negative weight cycle.
+     * This method also computes the predecessor matrix P, where P[i][j] represents the predecessor
+     * of vertex j on the shortest path from i to j.
      *
-     * The running time of this method is O(n^3).
+     * The running time of this method is O(V^3).
      *
      * @return the matrix of the all-pair shortest paths
      * */
@@ -54,17 +55,56 @@ public class Graph {
         }
         for (int k = 0; k < n; k++) {
             Double [][] Dk = new Double[n][n];
+            Integer [][] Pk = new Integer[n][n];
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
-                    Dk[i][j] = Math.min(D[i][j], D[i][k] + D[k][j]);
+                    if(D[i][j] <= D[i][k] + D[k][j]) {
+                        Dk[i][j] = D[i][j];
+                        Pk[i][j] = P[i][j];
+                    }
+                    else {
+                        Dk[i][j] = D[i][k] + D[k][j];
+                        Pk[i][j] = P[k][j];
+                    }
                 }
             }
             D = Dk;
+            P = Pk;
         }
         return D;
     }
 
 
+    /** A method that computes the transitive closure of a given graph, that is it returns a Boolean matrix T,
+     * where T[i][j] is true if there is a path from i to j in the graph, false otherwise.
+     *
+     * Algorithm runs in O(V^3) time.
+     *
+     * @return the matrix of transitive closure of the graph
+     */
+    public Boolean [][] transitiveClosure(){
+        int n = numberOfNodes;
+        Boolean [][] T = new Boolean[n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                T[i][j] = (i == j || weight(i, j) < Double.POSITIVE_INFINITY);
+            }
+        }
+        for (Boolean[] booleans : T) {
+            System.out.println(Arrays.toString(booleans));
+        }
+        System.out.println();
+        for (int k = 0; k < n; k++) {
+            Boolean [][] Tk = new Boolean[n][n];
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    Tk[i][j] = (T[i][j] || (T[i][k] && T[k][j]));
+                }
+            }
+            T = Tk;
+        }
+        return T;
+    }
 
     private double weight(int i, int j){
         if(i == j) return 0;
@@ -138,8 +178,9 @@ public class Graph {
         for (int i = 0; i < 5; i++) {
             g.addEdge(sc.nextInt(), sc.nextInt(), sc.nextDouble());
         }
-        //Double [][] d = g.floydWarshall(g.adjacencyMatrix);
-        Double [][] d = g.fasterShortestPaths();
-        System.out.println(new Graph(4, d));
+        Boolean [][] b = g.transitiveClosure();
+        for (Boolean[] booleans : b) {
+            System.out.println(Arrays.toString(booleans));
+        }
     }
 }
