@@ -42,6 +42,7 @@ public class DirectedGraph {
      * @param u the index of the source vertex
      * @param v the index of the end vertex
      */
+    @SuppressWarnings("unused")
     public void removeEdge(int u, int v){
         adjList[u].removeNeighbor(adjList[v]);
     }
@@ -81,6 +82,7 @@ public class DirectedGraph {
      */
     public double [] dijkstra(int source){
         double [] distance = new double[numberVertices];
+        @SuppressWarnings("MismatchedReadAndWriteOfArray")
         int [] predecessor = new int[numberVertices];
         for (int i = 0; i < numberVertices; i++) {
             distance[i] = Double.POSITIVE_INFINITY;
@@ -123,14 +125,15 @@ public class DirectedGraph {
      * @throws NegativeCycleException if a negative cycle is detected
      */
 
+    @SuppressWarnings("WeakerAccess")
     public double [] bellmanFord(int source) throws NegativeCycleException {
-        double [] distance = new double[numberVertices];
+        double[] distance = new double[numberVertices];
         for (int i = 0; i < distance.length; i++) {
             distance[i] = Double.POSITIVE_INFINITY;
         }
         distance[source] = 0;
         for (int i = 0; i < numberVertices - 1; i++) {
-            for(Vertex u : adjList) {
+            for (Vertex u : adjList) {
                 for (Vertex v : u.neighbors.keySet()) {
                     if (distance[u.index] + weight(u, v) < distance[v.index]) {
                         distance[v.index] = distance[u.index] + weight(u, v);
@@ -138,7 +141,7 @@ public class DirectedGraph {
                 }
             }
         }
-        for(Vertex u : adjList) {
+        for (Vertex u : adjList) {
             for (Vertex v : u.neighbors.keySet()) {
                 if (distance[u.index] + weight(u, v) < distance[v.index]) {
                     throw new NegativeCycleException("Negative cycle detected");
