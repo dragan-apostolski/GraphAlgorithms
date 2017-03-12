@@ -79,11 +79,11 @@ public class DirectedGraph {
      * @param source the index of the starting vertex
      * @return an array with the shortest paths reachable from the source vertex
      */
-    public int [] dijkstra(int source){
-        int [] distance = new int[numberVertices];
+    public double [] dijkstra(int source){
+        double [] distance = new double[numberVertices];
         int [] predecessor = new int[numberVertices];
         for (int i = 0; i < numberVertices; i++) {
-            distance[i] = Integer.MIN_VALUE;
+            distance[i] = Double.POSITIVE_INFINITY;
             predecessor[i] = -1;
         }
         distance[source] = 0;
@@ -93,13 +93,7 @@ public class DirectedGraph {
         while(!pq.isEmpty()){
             Vertex u = pq.remove();
             for (Vertex v : u.neighbors.keySet()) {
-                if(distance[v.index] < 0){
-                    distance[v.index] = distance[u.index] + weight(u, v);
-                    v.setMinDistance(distance[v.index]);
-                    pq.add(v);
-                    predecessor[v.index] = u.index;
-                }
-                else if(distance[u.index] + weight(u, v) < distance[v.index]){
+                if(distance[u.index] + weight(u, v) < distance[v.index]){
                     distance[v.index] = distance[u.index] + weight(u, v);
                     v.setMinDistance(distance[v.index]);
                     pq.add(v);
@@ -163,7 +157,6 @@ public class DirectedGraph {
         for (int i = 0; i < m; i++) {
             g.addEdge(sc.nextInt(), sc.nextInt(), sc.nextInt());
         }
-        double [] sp = g.bellmanFord(sc.nextInt());
-        if(sp!=null) System.out.println(Arrays.toString(sp));
+        System.out.println(Arrays.toString(g.dijkstra(sc.nextInt())));
     }
 }

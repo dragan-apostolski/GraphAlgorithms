@@ -14,7 +14,10 @@ public class Graph {
         this.numberOfNodes = numberOfNodes;
         this.adjacencyMatrix = new Double[numberOfNodes][numberOfNodes];
         this.predecessorMatrix = new int[numberOfNodes][numberOfNodes];
-        for (int i = 0; i < adjacencyMatrix.length; i++) {
+        for (Double[] anAdjacencyMatrix : adjacencyMatrix) {
+            Arrays.fill(anAdjacencyMatrix, Double.POSITIVE_INFINITY);
+        }
+        for (int i = 0; i < numberOfNodes; i++) {
             adjacencyMatrix[i][i] = 0d;
         }
     }
@@ -28,6 +31,40 @@ public class Graph {
     public void addEdge(int i, int j, Double weight){
         adjacencyMatrix[i][j] = weight;
     }
+
+
+    /** Implementation of the Floyd - Warshall algorithm for computing all - pair shortest
+     * paths in a graph.
+     *
+     * The running time of this method is O(n^3).
+     *
+     * @return the matrix of the all-pair shortest paths
+     * */
+    public Double [][] floydWarshall(){
+        int n = adjacencyMatrix.length;
+        Double [][] D = adjacencyMatrix;
+        Integer [][] P = new Integer[n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if(i == j || weight(i, j) == Double.POSITIVE_INFINITY)
+                    P[i][j] = null;
+                else if (weight(i, j) < Double.POSITIVE_INFINITY)
+                    P[i][j] = i;
+            }
+        }
+        for (int k = 0; k < n; k++) {
+            Double [][] Dk = new Double[n][n];
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    Dk[i][j] = Math.min(D[i][j], D[i][k] + D[k][j]);
+                }
+            }
+            D = Dk;
+        }
+        return D;
+    }
+
+
 
     private double weight(int i, int j){
         if(i == j) return 0;
@@ -96,11 +133,13 @@ public class Graph {
     }
 
     public static void main(String[] args) {
-        Graph g = new Graph(5);
+        Graph g = new Graph(4);
         Scanner sc = new Scanner(System.in);
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < 5; i++) {
             g.addEdge(sc.nextInt(), sc.nextInt(), sc.nextDouble());
         }
-        System.out.println(new Graph(5, g.fasterShortestPaths()));
+        //Double [][] d = g.floydWarshall(g.adjacencyMatrix);
+        Double [][] d = g.fasterShortestPaths();
+        System.out.println(new Graph(4, d));
     }
 }

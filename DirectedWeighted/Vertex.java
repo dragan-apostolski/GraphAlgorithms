@@ -5,17 +5,17 @@ import com.intellij.util.containers.HashMap;
 
 public class Vertex implements Comparable<Vertex>{
     public int index;
-    private Integer minDistance;
+    private Double minDistance;
     public HashMap<Vertex, Integer> neighbors;
 
     Vertex(int index) {
         this.index = index;
-        minDistance = Integer.MAX_VALUE;
+        minDistance = Double.POSITIVE_INFINITY;
         neighbors = new HashMap<>();
     }
 
-    public void setMinDistance(int weight) {
-        this.minDistance = weight;
+    public void setMinDistance(double distance) {
+        this.minDistance = distance;
     }
 
 
