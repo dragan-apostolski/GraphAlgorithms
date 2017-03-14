@@ -124,7 +124,6 @@ public class DirectedGraph {
      * every other reachable vertex in the graph
      * @throws NegativeCycleException if a negative cycle is detected
      */
-
     @SuppressWarnings("WeakerAccess")
     public double [] bellmanFord(int source) throws NegativeCycleException {
         double[] distance = new double[numberVertices];
@@ -135,9 +134,7 @@ public class DirectedGraph {
         for (int i = 0; i < numberVertices - 1; i++) {
             for (Vertex u : adjList) {
                 for (Vertex v : u.neighbors.keySet()) {
-                    if (distance[u.index] + weight(u, v) < distance[v.index]) {
-                        distance[v.index] = distance[u.index] + weight(u, v);
-                    }
+                    relax(distance, u, v);
                 }
             }
         }
@@ -149,6 +146,13 @@ public class DirectedGraph {
             }
         }
         return distance;
+    }
+
+
+    private void relax(double distance [], Vertex u, Vertex v){
+        if (distance[u.index] + weight(u, v) < distance[v.index]) {
+            distance[v.index] = distance[u.index] + weight(u, v);
+        }
     }
 
 
