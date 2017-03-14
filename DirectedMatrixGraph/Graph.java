@@ -97,10 +97,6 @@ public class Graph {
                 T[i][j] = (i == j || weight(i, j) < Double.POSITIVE_INFINITY);
             }
         }
-        for (Boolean[] booleans : T) {
-            System.out.println(Arrays.toString(booleans));
-        }
-        System.out.println();
         for (int k = 0; k < n; k++) {
             Boolean [][] Tk = new Boolean[n][n];
             for (int i = 0; i < n; i++) {

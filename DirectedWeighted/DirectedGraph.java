@@ -70,7 +70,7 @@ public class DirectedGraph {
      * be reached.
      * The predecessor array in this method consists of the predecessors of each vertex in the shortest
      * path from the source vertex to that vertex. Since this method computes the shortest paths from
-     * the source vertex to every other vertex, that method makes no use. But it can be easily modified
+     * the source vertex to every other vertex, that array makes no use. But it can be easily modified
      * to print the shortest path if this method is overridden to compute the shortest path from a source
      * vertex to a given end vertex.
      *
@@ -114,7 +114,7 @@ public class DirectedGraph {
      * if a negative cycle is reachable from the source vertex. If so, the method throws
      * a {@link NegativeCycleException}, indicating that shortest paths can't be computed
      * from this source vertex. If the graph is strongly connected and has a negative cycle,
-     * a call of this method from any source vertex will always throw a {@link NegativeCycleException}.
+     * a call of this method from any source vertex will always result in a {@link NegativeCycleException}.
      *
      * This method runs in O(V*E) time, where V is the number of vertices and E is
      * the number of edges in the graph
@@ -149,7 +149,7 @@ public class DirectedGraph {
     }
 
 
-    private void relax(double distance [], Vertex u, Vertex v){
+    protected void relax(double distance [], Vertex u, Vertex v){
         if (distance[u.index] + weight(u, v) < distance[v.index]) {
             distance[v.index] = distance[u.index] + weight(u, v);
         }
