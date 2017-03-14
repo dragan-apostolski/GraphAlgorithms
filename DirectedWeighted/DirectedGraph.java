@@ -112,9 +112,9 @@ public class DirectedGraph {
      * with negative edge weights.
      * This algorithm computes the shortest paths from the source vertex and checks
      * if a negative cycle is reachable from the source vertex. If so, the method throws
-     * a {@link NegativeCycleException}, indicating that shortest paths can't be computed
+     * a {@link NegativeWeightCycleException}, indicating that shortest paths can't be computed
      * from this source vertex. If the graph is strongly connected and has a negative cycle,
-     * a call of this method from any source vertex will always result in a {@link NegativeCycleException}.
+     * a call of this method from any source vertex will always result in a {@link NegativeWeightCycleException}.
      *
      * This method runs in O(V*E) time, where V is the number of vertices and E is
      * the number of edges in the graph
@@ -122,10 +122,10 @@ public class DirectedGraph {
      * @param source the index of the source vertex
      * @return a double array with the shortest paths from the source vertex to
      * every other reachable vertex in the graph
-     * @throws NegativeCycleException if a negative cycle is detected
+     * @throws NegativeWeightCycleException if a negative weight cycle is detected
      */
     @SuppressWarnings("WeakerAccess")
-    public double [] bellmanFord(int source) throws NegativeCycleException {
+    public double [] bellmanFord(int source) throws NegativeWeightCycleException {
         double[] distance = new double[numberVertices];
         for (int i = 0; i < distance.length; i++) {
             distance[i] = Double.POSITIVE_INFINITY;
@@ -141,7 +141,7 @@ public class DirectedGraph {
         for (Vertex u : adjList) {
             for (Vertex v : u.neighbors.keySet()) {
                 if (distance[u.index] + weight(u, v) < distance[v.index]) {
-                    throw new NegativeCycleException("Negative cycle detected");
+                    throw new NegativeWeightCycleException("Negative weight cycle detected");
                 }
             }
         }
@@ -156,7 +156,7 @@ public class DirectedGraph {
     }
 
 
-    public static void main(String[] args) throws NegativeCycleException {
+    public static void main(String[] args) throws NegativeWeightCycleException {
         Scanner sc = new Scanner(System.in);
         int n = sc.nextInt();
         DirectedGraph g = new DirectedGraph(n);

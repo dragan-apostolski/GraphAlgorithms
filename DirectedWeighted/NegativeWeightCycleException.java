@@ -1,7 +1,7 @@
 package Graphs.DirectedWeighted;
 
-public class NegativeCycleException extends Exception{
-    public NegativeCycleException(String message) {
+public class NegativeWeightCycleException extends Exception{
+    public NegativeWeightCycleException(String message) {
         super(message);
     }
 }
