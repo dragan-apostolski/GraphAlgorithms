@@ -1,12 +1,12 @@
 package Graphs.DirectedWeighted;
 
-import com.intellij.util.containers.HashMap;
+import java.util.HashMap;
 
 
-public class Vertex implements Comparable<Vertex>{
+public class Vertex implements Comparable<Vertex>,Cloneable{
     public int index;
     private Double minDistance;
-    public HashMap<Vertex, Integer> neighbors;
+    public java.util.HashMap<Vertex, Double> neighbors;
 
     Vertex(int index) {
         this.index = index;
@@ -18,8 +18,11 @@ public class Vertex implements Comparable<Vertex>{
         this.minDistance = distance;
     }
 
+    public Double getMinDistance() {
+        return minDistance;
+    }
 
-    void addNeighbor(Vertex v, int weight){
+    void addNeighbor(Vertex v, double weight){
         neighbors.put(v, weight);
     }
 
@@ -27,11 +30,22 @@ public class Vertex implements Comparable<Vertex>{
         neighbors.remove(v);
     }
 
+    void updateWeight(Vertex u, double newWeight){
+        neighbors.put(u, newWeight);
+    }
+
     @Override
     public int compareTo(Vertex o) {
         return minDistance.compareTo(o.minDistance);
     }
 
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        Vertex v = new Vertex(this.index);
+        v.minDistance = minDistance;
+        v.neighbors = new HashMap<>(neighbors);
+        return v;
+    }
 
     @Override
     public String toString() {

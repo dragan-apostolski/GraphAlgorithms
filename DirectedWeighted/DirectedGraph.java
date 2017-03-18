@@ -8,7 +8,7 @@ import java.util.*;
  *
  * @author drapostolski
  */
-public class DirectedGraph {
+public class DirectedGraph implements Cloneable{
 
     protected int numberVertices;
     protected Vertex[] adjList;
@@ -42,7 +42,6 @@ public class DirectedGraph {
      * @param u the index of the source vertex
      * @param v the index of the end vertex
      */
-    @SuppressWarnings("unused")
     public void removeEdge(int u, int v){
         adjList[u].removeNeighbor(adjList[v]);
     }
@@ -59,7 +58,7 @@ public class DirectedGraph {
      * @param v the index of the end vertex
      * @return the weight of the edge (u, v).
      */
-    protected int weight(Vertex u, Vertex v){
+    protected double weight(Vertex u, Vertex v){
         return adjList[u.index].neighbors.get(v);
     }
 
@@ -67,6 +66,16 @@ public class DirectedGraph {
         if (distance[u.index] + weight(u, v) < distance[v.index]) {
             distance[v.index] = distance[u.index] + weight(u, v);
         }
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        Object clone = super.clone();
+        DirectedGraph g = new DirectedGraph(numberVertices);
+        for (int i = 0; i < g.adjList.length; i++) {
+            g.adjList[i] = (Vertex) adjList[i].clone();
+        }
+        return g;
     }
 
     @Override
@@ -93,7 +102,6 @@ public class DirectedGraph {
      */
     public double [] dijkstra(int source){
         double [] distance = new double[numberVertices];
-        @SuppressWarnings("MismatchedReadAndWriteOfArray")
         int [] predecessor = new int[numberVertices];
         for (int i = 0; i < numberVertices; i++) {
             distance[i] = Double.POSITIVE_INFINITY;
@@ -135,7 +143,6 @@ public class DirectedGraph {
      * every other reachable vertex in the graph
      * @throws NegativeWeightCycleException if a negative weight cycle is detected
      */
-    @SuppressWarnings("WeakerAccess")
     public double [] bellmanFord(int source) throws NegativeWeightCycleException {
         double[] distance = new double[numberVertices];
         for (int i = 0; i < distance.length; i++) {
@@ -157,5 +164,49 @@ public class DirectedGraph {
             }
         }
         return distance;
+    }
+
+    /** An implementation of Johnson's algorithm for constructing the all - pair shortest paths matrix in
+     * a sparse graph. This method depends on the Bellman-Ford implementation to detect negative weight cycles,
+     * after the graph structure is augmented with adding a new source vertex. If such cycle is detected, the
+     * {@link NegativeWeightCycleException} is rethrown from the bellmanFord method. It also depends on the
+     * Dijkstra's algorithm implementation, now being assured that there are no negative weight cycles,
+     * to run it from each source vertex in the process of computing the all - pair shortest paths.
+     *
+     * This method runs in O(V*E*lgV) time (given that dijkstra is implemented with a binary {@link PriorityQueue})
+     * and is a slightly faster than the Floyd - Warshall implementation in the {@link Graphs.DirectedMatrixGraph.Graph}
+     * class. It is a better choice to use this method to compute the all - pair shortest paths if the graph is sparse,
+     * that is it has fewer edges, than running the Floyd - Warshall implementation or the matrix multiplication method.
+     *
+     * @return the all - pair shortest paths matrix
+     * @throws CloneNotSupportedException (this shouldn't happen)
+     * @throws NegativeWeightCycleException if a negative weight cycle is detected
+     */
+    public Double [][] johnson() throws CloneNotSupportedException, NegativeWeightCycleException {
+        DirectedGraph graph = (DirectedGraph) this.clone();
+        Vertex s = new Vertex(graph.adjList.length);
+        for (Vertex vertex : this.adjList) {
+            s.addNeighbor(vertex, 0);
+        }
+        graph.addVertex(s);
+        Map<Vertex, Double> h = new HashMap<>();
+        double [] sp = graph.bellmanFord(s.index);
+        for (int i = 0; i < sp.length - 1; i++) {
+            h.put(adjList[i], sp[i]);
+        }
+        for (int i = 0; i < numberVertices; i++) {
+            Vertex u = this.adjList[i];
+            for (Vertex v : u.neighbors.keySet()) {
+                u.updateWeight(v, weight(u, v) + h.get(u) - h.get(v));
+            }
+        }
+        Double [][] D = new Double[numberVertices][numberVertices];
+        for (int i = 0; i < D.length; i++) {
+            double [] sps = dijkstra(i);
+            for (int j = 0; j < D.length; j++) {
+                D[i][j] = sps[j] + h.get(adjList[j]) - h.get(adjList[i]);
+            }
+        }
+        return D;
     }
 }
