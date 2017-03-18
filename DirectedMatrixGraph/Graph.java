@@ -167,16 +167,4 @@ public class Graph {
         }
         return sb.toString();
     }
-
-    public static void main(String[] args) {
-        Graph g = new Graph(4);
-        Scanner sc = new Scanner(System.in);
-        for (int i = 0; i < 5; i++) {
-            g.addEdge(sc.nextInt(), sc.nextInt(), sc.nextDouble());
-        }
-        Boolean [][] b = g.transitiveClosure();
-        for (Boolean[] booleans : b) {
-            System.out.println(Arrays.toString(booleans));
-        }
-    }
 }

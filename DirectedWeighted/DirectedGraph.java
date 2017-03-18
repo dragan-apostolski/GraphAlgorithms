@@ -130,9 +130,9 @@ public class DirectedGraph implements Cloneable{
     /** An implementation of the Bellman - Ford algorithm for shortest paths in a graph
      * with negative edge weights.
      * This algorithm computes the shortest paths from the source vertex and checks
-     * if a negative cycle is reachable from the source vertex. If so, the method throws
+     * if a negative weight cycle is reachable from the source vertex. If so, the method throws
      * a {@link NegativeWeightCycleException}, indicating that shortest paths can't be computed
-     * from this source vertex. If the graph is strongly connected and has a negative cycle,
+     * from this source vertex. If the graph is strongly connected and has a negative weight cycle,
      * a call of this method from any source vertex will always result in a {@link NegativeWeightCycleException}.
      *
      * This method runs in O(V*E) time, where V is the number of vertices and E is
