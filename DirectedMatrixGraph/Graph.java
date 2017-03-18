@@ -2,7 +2,6 @@ package Graphs.DirectedMatrixGraph;
 
 
 import java.util.Arrays;
-import java.util.Scanner;
 
 public class Graph {
 

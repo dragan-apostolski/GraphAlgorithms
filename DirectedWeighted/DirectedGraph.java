@@ -1,8 +1,10 @@
 package Graphs.DirectedWeighted;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
-/** A class that represents a directed graph with weighted edges.
+/**
+ * A class that represents a directed graph with weighted edges.
  * Every vertex is represented via the {@link Vertex} class, while every edge is
  * internally represented in the same Vertex class.
  *
@@ -14,7 +16,8 @@ public class DirectedGraph implements Cloneable{
     protected Vertex[] adjList;
 
 
-    /**Creates an empty Directed Graph with the given number of vertices. No edges are created.
+    /**
+     * Creates an empty Directed Graph with the given number of vertices. No edges are created.
      *
      * @param numberOfVertices the initial number of vertices
      */
@@ -26,7 +29,8 @@ public class DirectedGraph implements Cloneable{
     }
 
 
-    /**Adds a directed edge (u, v) with the given weight to the graph.
+    /**
+     * Adds a directed edge (u, v) with the given weight to the graph.
      *
      * @param u the index of the vertex where the edge comes out from
      * @param v the index of the vertex where the edge is directed to
@@ -37,7 +41,8 @@ public class DirectedGraph implements Cloneable{
     }
 
 
-    /**Removes the directed edge (u,v) from the graph.
+    /**
+     * Removes the directed edge (u,v) from the graph.
      *
      * @param u the index of the source vertex
      * @param v the index of the end vertex
@@ -46,6 +51,11 @@ public class DirectedGraph implements Cloneable{
         adjList[u].removeNeighbor(adjList[v]);
     }
 
+    /**
+     * Adds a vertex to this graph.
+     *
+     * @param v the new vertex to be added
+     */
     public void addVertex(Vertex v){
         adjList = Arrays.copyOf(adjList, adjList.length + 1);
         adjList[adjList.length - 1] = v;
@@ -53,7 +63,8 @@ public class DirectedGraph implements Cloneable{
     }
 
 
-    /** Returns the weight of the directed edge between u and v.
+    /**
+     * Returns the weight of the directed edge between u and v.
      * @param u the index of the source vertex
      * @param v the index of the end vertex
      * @return the weight of the edge (u, v).
@@ -62,10 +73,12 @@ public class DirectedGraph implements Cloneable{
         return adjList[u.index].neighbors.get(v);
     }
 
-    protected void relax(double distance [], Vertex u, Vertex v){
+    protected boolean relax(double distance [], Vertex u, Vertex v){
         if (distance[u.index] + weight(u, v) < distance[v.index]) {
             distance[v.index] = distance[u.index] + weight(u, v);
+            return true;
         }
+        else return false;
     }
 
     @Override
@@ -85,7 +98,8 @@ public class DirectedGraph implements Cloneable{
         return sb.toString();
     }
 
-    /** An implementation of Dijkstra's algorithm with a binary min {@link PriorityQueue}
+    /**
+     * An implementation of Dijkstra's algorithm with a binary min {@link PriorityQueue}
      * that returns the shortest paths from the source vertex to every other vertex that can
      * be reached.
      * The predecessor array in this method consists of the predecessors of each vertex in the shortest
@@ -114,9 +128,8 @@ public class DirectedGraph implements Cloneable{
         while(!pq.isEmpty()){
             Vertex u = pq.remove();
             for (Vertex v : u.neighbors.keySet()) {
-                if(distance[u.index] + weight(u, v) < distance[v.index]){
-                    distance[v.index] = distance[u.index] + weight(u, v);
-                    v.setMinDistance(distance[v.index]);
+                if(relax(distance, u, v)){
+                    v.setDistance(distance[v.index]);
                     pq.add(v);
                     predecessor[v.index] = u.index;
                 }
@@ -127,7 +140,8 @@ public class DirectedGraph implements Cloneable{
     }
 
 
-    /** An implementation of the Bellman - Ford algorithm for shortest paths in a graph
+    /**
+     * An implementation of the Bellman - Ford algorithm for shortest paths in a graph
      * with negative edge weights.
      * This algorithm computes the shortest paths from the source vertex and checks
      * if a negative weight cycle is reachable from the source vertex. If so, the method throws
@@ -166,7 +180,8 @@ public class DirectedGraph implements Cloneable{
         return distance;
     }
 
-    /** An implementation of Johnson's algorithm for constructing the all - pair shortest paths matrix in
+    /**
+     * An implementation of Johnson's algorithm for constructing the all - pair shortest paths matrix in
      * a sparse graph. This method depends on the Bellman-Ford implementation to detect negative weight cycles,
      * after the graph structure is augmented with adding a new source vertex. If such cycle is detected, the
      * {@link NegativeWeightCycleException} is rethrown from the bellmanFord method. It also depends on the
@@ -208,5 +223,77 @@ public class DirectedGraph implements Cloneable{
             }
         }
         return D;
+    }
+
+    /**
+     * An implementation of the Breadth-First Search (BFS) algorithm for computing the level distance
+     * from the source (root) vertex to every other reachable vertex in the graph. If a vertex is not reachable
+     * from the source vertex, its distance will be marked as positive infinity.
+     *
+     * The running time of this method is O(V + E).
+     *
+     * @param source the index of the source vertex
+     * @return the array of distances from the source vertex
+     */
+    public Double [] bfs(int source){
+        Double [] distance = new Double[numberVertices];
+        Set<Vertex> visited = new HashSet<>();
+        for (int i = 0; i < distance.length; i++) {
+            distance[i] = Double.POSITIVE_INFINITY;
+        }
+        distance[source] = 0d;
+        Queue<Vertex> q = new LinkedList<>();
+        q.add(adjList[source]);
+        while(!q.isEmpty()){
+            Vertex u = q.remove();
+            visited.add(u);
+            for (Vertex v : u.neighbors.keySet()) {
+                if(!visited.contains(v)){
+                    distance[v.index] = distance[u.index] + 1;
+                    q.add(v);
+                }
+            }
+        }
+        return distance;
+    }
+
+    /**
+     * This method performs a topological sort of the graph, based on the the finish time of each vertex
+     * during the dfs visit method calls.
+     * The method returns a {@link TreeSet} of vertices which is sorted in decreasing order of the time they are
+     * finished, that is the time they are lastly visited by the dfs visit method.
+     *
+     * @return topologically sorted set of the vertices in this graph
+     */
+    public TreeSet<Vertex> topologicalSort(){
+        dfs();
+        Comparator<Vertex> vertexComparator = Comparator.comparing(Vertex::getTimeFinished).reversed();
+        return Arrays.stream(adjList)
+                .collect(Collectors.toCollection( () -> new TreeSet<>(vertexComparator)));
+    }
+
+    private Integer time;
+
+    private Integer[] dfs(){
+        time = 0;
+        Integer [] predecessor = new Integer[numberVertices];
+        Set<Vertex> visited = new HashSet<>();
+        for (Vertex u : adjList) {
+            if(!visited.contains(u))
+                dfsVisit(visited, predecessor, u);
+        }
+        return predecessor;
+    }
+
+    private void dfsVisit(Set<Vertex> visited, Integer[] predecessor, Vertex u) {
+        u.timeDiscovered = ++time;
+        for (Vertex v : u.neighbors.keySet()) {
+            if(!visited.contains(v)){
+                predecessor[v.index] = u.index;
+                dfsVisit(visited, predecessor, v);
+            }
+        }
+        u.timeFinished = ++time;
+        visited.add(u);
     }
 }
