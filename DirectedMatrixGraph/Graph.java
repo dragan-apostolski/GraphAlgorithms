@@ -38,7 +38,8 @@ public class Graph {
     }
 
 
-    /** Implementation of the Floyd - Warshall algorithm for computing all - pair shortest
+    /**
+     * Implementation of the Floyd - Warshall algorithm for computing all - pair shortest
      * paths in a directed graph with negative edge weights. It is assumed that the graph does
      * not have a negative weight cycle.
      * This method also computes the predecessor matrix P, where P[i][j] represents the predecessor
@@ -82,7 +83,8 @@ public class Graph {
     }
 
 
-    /** A method that computes the transitive closure of the graph, that is it returns a Boolean matrix T,
+    /**
+     * A method that computes the transitive closure of the graph, that is it returns a Boolean matrix T,
      * where T[i][j] is true if there is a path from i to j in the graph, false otherwise.
      *
      * Algorithm runs in O(V^3) time.
@@ -109,7 +111,8 @@ public class Graph {
         return T;
     }
 
-    /**Function for computing shortest paths i -> j (for all (i, j) e V) when using at most m edges.
+    /**
+     * Function for computing shortest paths i -> j (for all (i, j) e V) when using at most m edges.
      * The m parameter is specified when iterating and calling this function for each m (1...n-1). This function
      * is invoked by either {@link Graph#fasterShortestPaths} or {@link Graph#slowShortestPaths} functions.
      *
