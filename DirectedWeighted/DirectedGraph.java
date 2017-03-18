@@ -47,6 +47,12 @@ public class DirectedGraph {
         adjList[u].removeNeighbor(adjList[v]);
     }
 
+    public void addVertex(Vertex v){
+        adjList = Arrays.copyOf(adjList, adjList.length + 1);
+        adjList[adjList.length - 1] = v;
+        numberVertices = adjList.length;
+    }
+
 
     /** Returns the weight of the directed edge between u and v.
      * @param u the index of the source vertex
@@ -57,6 +63,11 @@ public class DirectedGraph {
         return adjList[u.index].neighbors.get(v);
     }
 
+    protected void relax(double distance [], Vertex u, Vertex v){
+        if (distance[u.index] + weight(u, v) < distance[v.index]) {
+            distance[v.index] = distance[u.index] + weight(u, v);
+        }
+    }
 
     @Override
     public String toString() {
@@ -146,24 +157,5 @@ public class DirectedGraph {
             }
         }
         return distance;
-    }
-
-
-    protected void relax(double distance [], Vertex u, Vertex v){
-        if (distance[u.index] + weight(u, v) < distance[v.index]) {
-            distance[v.index] = distance[u.index] + weight(u, v);
-        }
-    }
-
-
-    public static void main(String[] args) throws NegativeWeightCycleException {
-        Scanner sc = new Scanner(System.in);
-        int n = sc.nextInt();
-        DirectedGraph g = new DirectedGraph(n);
-        int m = sc.nextInt();
-        for (int i = 0; i < m; i++) {
-            g.addEdge(sc.nextInt(), sc.nextInt(), sc.nextInt());
-        }
-        System.out.println(Arrays.toString(g.bellmanFord(sc.nextInt())));
     }
 }
