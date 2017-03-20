@@ -36,7 +36,7 @@ public class DirectedGraph implements Cloneable{
      * @param v the index of the vertex where the edge is directed to
      * @param weight the weight of the directed edge (u, v)
      */
-    public void addEdge(int u, int v, int weight){
+    public void addEdge(int u, int v, double weight){
         adjList[u].addNeighbor(adjList[v], weight);
     }
 
@@ -257,6 +257,48 @@ public class DirectedGraph implements Cloneable{
         return distance;
     }
 
+    void transposeGraph() throws CloneNotSupportedException {
+        DirectedGraph gTransposed = new DirectedGraph(numberVertices);
+        for (int i = 0; i < numberVertices; i++) {
+            Vertex u = adjList[i];
+            for (Vertex v : u.neighbors.keySet()) {
+                gTransposed.addEdge(v.index, u.index, weight(u, v));
+            }
+            gTransposed.adjList[i].timeFinished = u.timeFinished;
+            gTransposed.adjList[i].timeDiscovered = u.timeDiscovered;
+        }
+        adjList = gTransposed.adjList;
+    }
+
+    public List<Set<Vertex>> stronglyConnectedComponents() throws CloneNotSupportedException {
+        dfs();
+        transposeGraph();
+        dfsTransposedEdges();
+        Vertex [] vertices = new Vertex[numberVertices];
+        List<Vertex> topologicallySorted = Arrays.stream(adjList).sorted(Comparator.comparing(Vertex::getTimeFinished).reversed()).collect(Collectors.toList());
+        vertices = topologicallySorted.toArray(vertices);
+
+        List<Set<Vertex>> stronglyConnectedComponents = new ArrayList<>();
+        Vertex u;
+        int i = 0;
+        while(i < vertices.length) {
+            u = vertices[i];
+            HashSet<Vertex> component = new HashSet<>();
+            component.add(u);
+            int j;
+            for (j = i + 1; j < vertices.length; j++) {
+                Vertex v = vertices[j];
+                if(v.timeDiscovered > u.timeDiscovered && v.timeFinished < u.timeFinished)
+                    component.add(v);
+                else break;
+            }
+            stronglyConnectedComponents.add(component);
+            i = j;
+        }
+        return stronglyConnectedComponents;
+    }
+
+
     /**
      * This method performs a topological sort of the graph, based on the the finish time of each vertex
      * during the dfs visit method calls.
@@ -274,7 +316,19 @@ public class DirectedGraph implements Cloneable{
 
     private Integer time;
 
-    private Integer[] dfs(){
+    public void dfsTransposedEdges() {
+        time = 0;
+        Integer [] predecessor = new Integer[numberVertices];
+        Set<Vertex> visited = new HashSet<>();
+        List<Vertex> topologicallySorted = Arrays.stream(adjList).sorted(Comparator.comparing(Vertex::getTimeFinished).reversed()).collect(Collectors.toList());
+
+        for (Vertex u : topologicallySorted) {
+            if(!visited.contains(u))
+                dfsVisit(visited, predecessor, u);
+        }
+    }
+
+    public Integer[] dfs(){
         time = 0;
         Integer [] predecessor = new Integer[numberVertices];
         Set<Vertex> visited = new HashSet<>();
@@ -287,6 +341,7 @@ public class DirectedGraph implements Cloneable{
 
     private void dfsVisit(Set<Vertex> visited, Integer[] predecessor, Vertex u) {
         u.timeDiscovered = ++time;
+        visited.add(u);
         for (Vertex v : u.neighbors.keySet()) {
             if(!visited.contains(v)){
                 predecessor[v.index] = u.index;
@@ -294,6 +349,5 @@ public class DirectedGraph implements Cloneable{
             }
         }
         u.timeFinished = ++time;
-        visited.add(u);
     }
 }
