@@ -269,19 +269,20 @@ public class DirectedGraph implements Cloneable{
 
     /**
      * This method finds all strongly connected components in the graphs and returns them as sets of vertices in one
-     * list.
+     * list, where each set of vertices represents the vertices in one strongly connected component.
      *
      * @return list of all the sets of strongly connected components
      */
     public List<Set<Vertex>> stronglyConnectedComponents(){
         dfs();
         transposeGraph();
-        dfsTransposedEdges();
+        return dfsTransposedEdges();
+    }
 
+    private List<Set<Vertex>> findAllDepthFirstTrees(){
         List<Vertex> vertices = Arrays.stream(adjList)
                 .sorted(Comparator.comparing(Vertex::getTimeFinished).reversed())
                 .collect(Collectors.toList());
-
         List<Set<Vertex>> stronglyConnectedComponents = new ArrayList<>();
         int i = 0;
         while(i < vertices.size()) {
@@ -317,18 +318,33 @@ public class DirectedGraph implements Cloneable{
 
     private Integer time;
 
-    private void dfsTransposedEdges() {
+    private List<Set<Vertex>> dfsTransposedEdges() {
         time = 0;
-        Integer [] predecessor = new Integer[numberVertices];
         Set<Vertex> visited = new HashSet<>();
         List<Vertex> topologicallySorted = Arrays.stream(adjList)
                 .sorted(Comparator.comparing(Vertex::getTimeFinished).reversed())
                 .collect(Collectors.toList());
-
+        List<Set<Vertex>> stronglyConnectedComponents = new ArrayList<>();
         for (Vertex u : topologicallySorted) {
-            if(!visited.contains(u))
-                dfsVisit(visited, predecessor, u);
+            if(!visited.contains(u)) {
+                HashSet<Vertex> component = new HashSet<>();
+                dfsVisit(visited, component, u);
+                stronglyConnectedComponents.add(component);
+            }
         }
+        return stronglyConnectedComponents;
+    }
+
+    private void dfsVisit(Set<Vertex> visited, HashSet<Vertex> component,  Vertex u) {
+        u.timeDiscovered = ++time;
+        component.add(u);
+        visited.add(u);
+        for (Vertex v : u.neighbors.keySet()) {
+            if(!visited.contains(v)){
+                dfsVisit(visited, component, v);
+            }
+        }
+        u.timeFinished = ++time;
     }
 
     private Integer[] dfs(){
