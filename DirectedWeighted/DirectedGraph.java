@@ -28,7 +28,6 @@ public class DirectedGraph implements Cloneable{
             adjList[i] = new Vertex(i);
     }
 
-
     /**
      * Adds a directed edge (u, v) with the given weight to the graph.
      *
@@ -39,7 +38,6 @@ public class DirectedGraph implements Cloneable{
     public void addEdge(int u, int v, double weight){
         adjList[u].addNeighbor(adjList[v], weight);
     }
-
 
     /**
      * Removes the directed edge (u,v) from the graph.
@@ -61,7 +59,6 @@ public class DirectedGraph implements Cloneable{
         adjList[adjList.length - 1] = v;
         numberVertices = adjList.length;
     }
-
 
     /**
      * Returns the weight of the directed edge between u and v.
@@ -139,15 +136,13 @@ public class DirectedGraph implements Cloneable{
         return distance;
     }
 
-
     /**
-     * An implementation of the Bellman - Ford algorithm for shortest paths in a graph
-     * with negative edge weights.
-     * This algorithm computes the shortest paths from the source vertex and checks
-     * if a negative weight cycle is reachable from the source vertex. If so, the method throws
-     * a {@link NegativeWeightCycleException}, indicating that shortest paths can't be computed
-     * from this source vertex. If the graph is strongly connected and has a negative weight cycle,
-     * a call of this method from any source vertex will always result in a {@link NegativeWeightCycleException}.
+     * An implementation of the Bellman - Ford algorithm for shortest paths in a graph with negative edge weights.
+     * This algorithm computes the shortest paths from the source vertex and checks if a negative weight cycle is
+     * reachable from the source vertex. If so, the method throws a {@link NegativeWeightCycleException}, indicating
+     * that shortest paths can't be computed from this source vertex. If the graph is one strongly connected component
+     * and has a negative weight cycle, a call of this method from any source vertex will always result in a
+     * {@link NegativeWeightCycleException}.
      *
      * This method runs in O(V*E) time, where V is the number of vertices and E is
      * the number of edges in the graph
@@ -181,12 +176,12 @@ public class DirectedGraph implements Cloneable{
     }
 
     /**
-     * An implementation of Johnson's algorithm for constructing the all - pair shortest paths matrix in
-     * a sparse graph. This method depends on the Bellman-Ford implementation to detect negative weight cycles,
-     * after the graph structure is augmented with adding a new source vertex. If such cycle is detected, the
-     * {@link NegativeWeightCycleException} is rethrown from the bellmanFord method. It also depends on the
-     * Dijkstra's algorithm implementation, now being assured that there are no negative weight cycles,
-     * to run it from each source vertex in the process of computing the all - pair shortest paths.
+     * An implementation of Johnson's algorithm for constructing the all - pair shortest paths matrix in a sparse graph.
+     * This method depends on the Bellman-Ford implementation to detect negative weight cycles, after the graph
+     * structure is augmented with adding a new source vertex. If such cycle is detected,
+     * the {@link NegativeWeightCycleException} is rethrown from the bellmanFord method. It also depends on the
+     * Dijkstra's algorithm implementation, now being assured that there are no negative weight cycles, to run it from
+     * each source vertex in the process of computing the all - pair shortest paths.
      *
      * This method runs in O(V*E*lgV) time (given that dijkstra is implemented with a binary {@link PriorityQueue})
      * and is a slightly faster than the Floyd - Warshall implementation in the {@link Graphs.DirectedMatrixGraph.Graph}
@@ -226,9 +221,9 @@ public class DirectedGraph implements Cloneable{
     }
 
     /**
-     * An implementation of the Breadth-First Search (BFS) algorithm for computing the level distance
-     * from the source (root) vertex to every other reachable vertex in the graph. If a vertex is not reachable
-     * from the source vertex, its distance will be marked as positive infinity.
+     * An implementation of the Breadth-First Search (BFS) algorithm for computing the level distance from the source
+     * (root) vertex to every other reachable vertex in the graph. If a vertex is not reachable from the source vertex,
+     * its distance will be marked as positive infinity.
      *
      * The running time of this method is O(V + E).
      *
@@ -257,51 +252,9 @@ public class DirectedGraph implements Cloneable{
         return distance;
     }
 
-    void transposeGraph() throws CloneNotSupportedException {
-        DirectedGraph gTransposed = new DirectedGraph(numberVertices);
-        for (int i = 0; i < numberVertices; i++) {
-            Vertex u = adjList[i];
-            for (Vertex v : u.neighbors.keySet()) {
-                gTransposed.addEdge(v.index, u.index, weight(u, v));
-            }
-            gTransposed.adjList[i].timeFinished = u.timeFinished;
-            gTransposed.adjList[i].timeDiscovered = u.timeDiscovered;
-        }
-        adjList = gTransposed.adjList;
-    }
-
-    public List<Set<Vertex>> stronglyConnectedComponents() throws CloneNotSupportedException {
-        dfs();
-        transposeGraph();
-        dfsTransposedEdges();
-        Vertex [] vertices = new Vertex[numberVertices];
-        List<Vertex> topologicallySorted = Arrays.stream(adjList).sorted(Comparator.comparing(Vertex::getTimeFinished).reversed()).collect(Collectors.toList());
-        vertices = topologicallySorted.toArray(vertices);
-
-        List<Set<Vertex>> stronglyConnectedComponents = new ArrayList<>();
-        Vertex u;
-        int i = 0;
-        while(i < vertices.length) {
-            u = vertices[i];
-            HashSet<Vertex> component = new HashSet<>();
-            component.add(u);
-            int j;
-            for (j = i + 1; j < vertices.length; j++) {
-                Vertex v = vertices[j];
-                if(v.timeDiscovered > u.timeDiscovered && v.timeFinished < u.timeFinished)
-                    component.add(v);
-                else break;
-            }
-            stronglyConnectedComponents.add(component);
-            i = j;
-        }
-        return stronglyConnectedComponents;
-    }
-
-
     /**
-     * This method performs a topological sort of the graph, based on the the finish time of each vertex
-     * during the dfs visit method calls.
+     * This method performs a topological sort of the graph, based on the the finish time of each vertex during the dfs
+     * visit method calls.
      * The method returns a {@link TreeSet} of vertices which is sorted in decreasing order of the time they are
      * finished, that is the time they are lastly visited by the dfs visit method.
      *
@@ -314,13 +267,63 @@ public class DirectedGraph implements Cloneable{
                 .collect(Collectors.toCollection( () -> new TreeSet<>(vertexComparator)));
     }
 
+    /**
+     * This method finds all strongly connected components in the graphs and returns them as sets of vertices in one
+     * list.
+     *
+     * @return list of all the sets of strongly connected components
+     */
+    public List<Set<Vertex>> stronglyConnectedComponents(){
+        dfs();
+        transposeGraph();
+        dfsTransposedEdges();
+
+        List<Vertex> vertices = Arrays.stream(adjList)
+                .sorted(Comparator.comparing(Vertex::getTimeFinished).reversed())
+                .collect(Collectors.toList());
+
+        List<Set<Vertex>> stronglyConnectedComponents = new ArrayList<>();
+        int i = 0;
+        while(i < vertices.size()) {
+            Vertex root = vertices.get(i);
+            HashSet<Vertex> component = new HashSet<>();
+            component.add(root);
+            int j;
+            for (j = i + 1; j < vertices.size(); j++) {
+                Vertex v = vertices.get(j);
+                if(v.timeDiscovered > root.timeDiscovered && v.timeFinished < root.timeFinished)
+                    component.add(v);
+                else break;
+            }
+            stronglyConnectedComponents.add(component);
+            i = j;
+        }
+        return stronglyConnectedComponents;
+    }
+
+    private void transposeGraph(){
+        DirectedGraph gTransposed = new DirectedGraph(numberVertices);
+        for (int i = 0; i < numberVertices; i++) {
+            Vertex u = adjList[i];
+            for (Vertex v : u.neighbors.keySet()) {
+                gTransposed.addEdge(v.index, u.index, weight(u, v));
+            }
+            gTransposed.adjList[i].timeFinished = u.timeFinished;
+            gTransposed.adjList[i].timeDiscovered = u.timeDiscovered;
+        }
+        adjList = gTransposed.adjList;
+    }
+
+
     private Integer time;
 
-    public void dfsTransposedEdges() {
+    private void dfsTransposedEdges() {
         time = 0;
         Integer [] predecessor = new Integer[numberVertices];
         Set<Vertex> visited = new HashSet<>();
-        List<Vertex> topologicallySorted = Arrays.stream(adjList).sorted(Comparator.comparing(Vertex::getTimeFinished).reversed()).collect(Collectors.toList());
+        List<Vertex> topologicallySorted = Arrays.stream(adjList)
+                .sorted(Comparator.comparing(Vertex::getTimeFinished).reversed())
+                .collect(Collectors.toList());
 
         for (Vertex u : topologicallySorted) {
             if(!visited.contains(u))
@@ -328,7 +331,7 @@ public class DirectedGraph implements Cloneable{
         }
     }
 
-    public Integer[] dfs(){
+    private Integer[] dfs(){
         time = 0;
         Integer [] predecessor = new Integer[numberVertices];
         Set<Vertex> visited = new HashSet<>();
