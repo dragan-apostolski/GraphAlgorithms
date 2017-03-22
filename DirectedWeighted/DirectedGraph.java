@@ -66,8 +66,9 @@ public class DirectedGraph implements Cloneable{
      * @param v the index of the end vertex
      * @return the weight of the edge (u, v).
      */
-    protected double weight(Vertex u, Vertex v){
-        return adjList[u.index].neighbors.get(v);
+    protected Double weight(Vertex u, Vertex v){
+        Double d =  adjList[u.index].neighbors.get(v);
+        return (d != null) ? d : Double.POSITIVE_INFINITY;
     }
 
     protected boolean relax(double distance [], Vertex u, Vertex v){
@@ -132,7 +133,6 @@ public class DirectedGraph implements Cloneable{
                 }
             }
         }
-
         return distance;
     }
 
@@ -250,6 +250,34 @@ public class DirectedGraph implements Cloneable{
             }
         }
         return distance;
+    }
+
+    /**
+     * A function that checks whether this graph is bipartite, returning true if so, false otherwise.
+     *
+     * @return a boolean value indicating whether this graph hold the bipartite property
+     */
+    public boolean isBipartite(){
+        int [] partitions = new int[numberVertices];
+        Set<Vertex> visited = new HashSet<>();
+        partitions[adjList[0].index] = 1;
+        visited.add(adjList[0]);
+        Queue<Vertex> q = new LinkedList<>();
+        q.add(adjList[0]);
+        while(!q.isEmpty()){
+            Vertex u = q.poll();
+            for (Vertex v : u.neighbors.keySet()) {
+                if(partitions[u.index] == partitions[v.index]) {
+                    return false;
+                }
+                else if (!visited.contains(v)){
+                    partitions[v.index] = 3 - partitions[u.index];
+                    q.add(v);
+                }
+            }
+            visited.add(u);
+        }
+        return true;
     }
 
     /**
