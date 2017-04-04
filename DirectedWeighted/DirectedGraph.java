@@ -60,6 +60,10 @@ public class DirectedGraph implements Cloneable{
         numberVertices = adjList.length;
     }
 
+    public Vertex[] getAdjList() {
+        return adjList;
+    }
+
     /**
      * Returns the weight of the directed edge between u and v.
      * @param u the index of the source vertex
