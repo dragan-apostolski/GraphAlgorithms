@@ -29,6 +29,11 @@ public class Vertex implements Comparable<Vertex>,Cloneable{
         neighbors.put(u, newWeight);
     }
 
+    double getWeight(Vertex v){
+        Double d = neighbors.get(v);
+        return (d != null) ? d : Double.POSITIVE_INFINITY;
+    }
+
 
     /**
      * The field distance in this class represents the distance of this vertex from

@@ -71,8 +71,7 @@ public class DirectedGraph implements Cloneable{
      * @return the weight of the edge (u, v).
      */
     protected Double weight(Vertex u, Vertex v){
-        Double d =  adjList[u.index].neighbors.get(v);
-        return (d != null) ? d : Double.POSITIVE_INFINITY;
+        return adjList[u.index].getWeight(v);
     }
 
     protected boolean relax(double distance [], Vertex u, Vertex v){
